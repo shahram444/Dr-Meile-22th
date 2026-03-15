@@ -1,5 +1,4 @@
 extends Node2D
-@warning_ignore("inferred_declaration", "unsafe_property_access", "unsafe_method_access", "unsafe_cast", "unsafe_call_argument", "untyped_declaration", "integer_division")
 
 # ══════════════════════════════════════════════════════════════════════
 #  SCENE 4: COMEDY VIGNETTES (44-64s)
@@ -81,7 +80,7 @@ func _draw_coffee_scene(t: float, f: int) -> void:
 
 	# Time label
 	var hours := [8, 10, 12, 14, 16, 18]
-	var h := hours[int(f / 20) % 6]
+	var h: int = hours[int(f / 20) % 6]
 	draw_string(_font, Vector2(830, 300), "%d:00 — COFFEE TIME!" % h,
 		HORIZONTAL_ALIGNMENT_CENTER, -1, 6, Color("333333"))
 
@@ -336,7 +335,7 @@ func _draw_clock(cx: float, cy: float, radius: float, f: int) -> void:
 		HORIZONTAL_ALIGNMENT_CENTER, -1, 6, Color("333333"))
 	# Hour hand
 	var hours := [8, 10, 12, 14, 16, 18]
-	var h := hours[int(f / 20) % 6]
+	var h: int = hours[int(f / 20) % 6]
 	var angle := float(h) / 12.0 * TAU - PI / 2.0
 	draw_line(Vector2(cx, cy), Vector2(cx + cos(angle) * 20, cy + sin(angle) * 20),
 		Color("333333"), 3.0)

@@ -1,5 +1,4 @@
 extends Node2D
-@warning_ignore("inferred_declaration", "unsafe_property_access", "unsafe_method_access", "unsafe_cast", "unsafe_call_argument", "untyped_declaration", "integer_division")
 
 # ══════════════════════════════════════════════════════════════════════
 #  SCENE 2: WORLD MAP JOURNEY (18-32s)

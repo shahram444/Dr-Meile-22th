@@ -1,5 +1,4 @@
 extends Node
-@warning_ignore("inferred_declaration", "unsafe_property_access", "unsafe_method_access", "unsafe_cast", "unsafe_call_argument", "untyped_declaration", "integer_division")
 
 # ══════════════════════════════════════════════════════════════════════
 #  CHIPTUNE MUSIC ENGINE
@@ -225,7 +224,7 @@ func _build_song() -> void:
 	for n in intro_melody:
 		lead.append([n[0], n[1], n[2], "square", 0.12, "sustain"])
 		# Subtle octave below
-		var low_note := n[0].replace("5", "4").replace("4", "3")
+		var low_note: String = n[0].replace("5", "4").replace("4", "3")
 		if NOTES.has(low_note):
 			harmony.append([low_note, n[1], n[2], "triangle", 0.04, "soft"])
 
@@ -263,7 +262,7 @@ func _build_song() -> void:
 			lead.append([n[0], off + n[1], n[2], "square", 0.12, "sustain"])
 			# Add harmony on repeats
 			if rep >= 1:
-				var h_note := _harmony_note(n[0])
+				var h_note: String = _harmony_note(n[0])
 				if h_note != "":
 					harmony.append([h_note, off + n[1], n[2], "pulse25", 0.06, "sustain"])
 
@@ -310,7 +309,7 @@ func _build_song() -> void:
 	for n in warm_melody:
 		lead.append([n[0], warm_offset + n[1], n[2], "square", 0.10, "soft"])
 		# Warm harmony
-		var h_note := _harmony_note(n[0])
+		var h_note: String = _harmony_note(n[0])
 		if h_note != "":
 			harmony.append([h_note, warm_offset + n[1], n[2], "triangle", 0.05, "soft"])
 
@@ -354,11 +353,11 @@ func _build_song() -> void:
 	for n in finale_melody:
 		lead.append([n[0], fin_offset + n[1], n[2], "square", 0.14, "sustain"])
 		# Octave above for sparkle
-		var hi := n[0].replace("4", "5").replace("5", "6")
+		var hi: String = n[0].replace("4", "5").replace("5", "6")
 		if NOTES.has(hi):
 			harmony.append([hi, fin_offset + n[1], n[2] * 0.5, "sine", 0.04, "pluck"])
 		# Third below for richness
-		var h_note := _harmony_note(n[0])
+		var h_note: String = _harmony_note(n[0])
 		if h_note != "":
 			harmony.append([h_note, fin_offset + n[1], n[2], "pulse25", 0.06, "sustain"])
 
