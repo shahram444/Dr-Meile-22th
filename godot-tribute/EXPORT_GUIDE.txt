@@ -1,0 +1,53 @@
+THE LEGEND OF MEILE — Video Export Guide
+=========================================
+
+PREREQUISITES:
+  - Godot 4.0+ (download: https://godotengine.org/download)
+  - ffmpeg (for MP4 conversion)
+
+=== OPTION A: Automatic (Linux/macOS) ===
+
+  chmod +x export_video.sh
+  ./export_video.sh                     # outputs meile_tribute.mp4
+  ./export_video.sh my_video.mp4        # custom filename
+
+=== OPTION B: Godot built-in movie writer (any OS) ===
+
+  1. Open terminal / command prompt
+  2. Run:
+
+     godot --path /path/to/godot-tribute --write-movie meile_tribute.avi --fixed-fps 30
+
+  3. The animation will play and auto-record to meile_tribute.avi
+  4. Convert to MP4 with ffmpeg:
+
+     ffmpeg -i meile_tribute.avi -c:v libx264 -crf 18 -pix_fmt yuv420p output.mp4
+
+=== OPTION C: Frame-by-frame capture ===
+
+  1. Run Godot with the --record flag:
+
+     godot --path /path/to/godot-tribute -- --record
+
+  2. PNG frames are saved to:
+     - Linux:   ~/.local/share/godot/app_userdata/The Legend of Meile/recording/
+     - Windows: %APPDATA%/Godot/app_userdata/The Legend of Meile/recording/
+     - macOS:   ~/Library/Application Support/Godot/app_userdata/The Legend of Meile/recording/
+
+  3. Combine with ffmpeg:
+
+     ffmpeg -framerate 30 -i frame_%05d.png -c:v libx264 -crf 18 -pix_fmt yuv420p output.mp4
+
+=== OPTION D: Interactive playback ===
+
+  1. Open Godot Editor
+  2. Open this project folder (godot-tribute/)
+  3. Press F5 (Play)
+  4. Click to start the animation
+  5. Use your OS screen recorder to capture
+
+NOTES:
+  - Video is 960x540 at 30 FPS
+  - Total duration: ~100 seconds
+  - The --write-movie method captures both video AND audio
+  - Frame capture method (B/C) does NOT capture audio

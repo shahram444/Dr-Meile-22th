@@ -1,4 +1,5 @@
 extends Node
+@warning_ignore("inferred_declaration", "unsafe_property_access", "unsafe_method_access", "unsafe_cast", "unsafe_call_argument", "untyped_declaration", "integer_division")
 
 # ══════════════════════════════════════════════════════════════════════
 #  DRAW UTILS — Professional Pixel Art Drawing Toolkit
@@ -76,7 +77,7 @@ const DEEP_BLACK := Color("101018")
 
 ## Draw a filled rectangle
 static func draw_px(canvas: CanvasItem, x: float, y: float, w: float, h: float, color: Color) -> void:
-	canvas.draw_rect(Rect2(snapf(x, 1), snapf(y, 1), w, h), color)
+	canvas.draw_rect(Rect2(round(x), round(y), w, h), color)
 
 ## Draw a filled circle
 static func draw_circle_px(canvas: CanvasItem, cx: float, cy: float, radius: float, color: Color) -> void:
@@ -173,7 +174,7 @@ static func draw_stat_bar(canvas: CanvasItem, font: Font, x: float, y: float, w:
 	draw_outline_rect(canvas, x + 140, y - 8, w, 12, Color("404060"), 1.0)
 	# Fill bar
 	if fill > 0:
-		var fill_w := floorf((w - 2) * fill)
+		var fill_w := floor((w - 2) * fill)
 		draw_gradient_v(canvas, x + 141, y - 7, fill_w, 10, color, Color(0, 0, 0))
 		draw_px(canvas, x + 141, y - 7, fill_w, 3, Color(color, 0.25))
 	# Value text

@@ -1,4 +1,5 @@
 extends Node2D
+@warning_ignore("inferred_declaration", "unsafe_property_access", "unsafe_method_access", "unsafe_cast", "unsafe_call_argument", "untyped_declaration", "integer_division")
 
 # ══════════════════════════════════════════════════════════════════════
 #  MAIN SCENE MANAGER
@@ -30,15 +31,28 @@ var _font: Font
 var _scenes: Array = []  # Child scene nodes
 var _current_scene_idx := -1
 
-# Typewriter text system
-var _typewriter_text := ""
-var _typewriter_target := ""
-var _typewriter_speed := 30.0  # chars per second
-var _typewriter_timer := 0.0
+# ── Video Recording ──
+var _recording := false
+var _record_frame_idx := 0
+var _record_dir := "user://recording"
+var _auto_start := false  # Set true when using --write-movie or recording mode
 
 func _ready() -> void:
 	# Load pixel font
 	_font = ThemeDB.fallback_font
+
+	# Check if launched with --record or --auto-start argument
+	for arg in OS.get_cmdline_args():
+		if arg == "--record":
+			_recording = true
+			_auto_start = true
+		if arg == "--auto-start" or arg == "--auto_start":
+			_auto_start = true
+
+	# When using Godot's built-in --write-movie, auto-start so it captures
+	if OS.has_feature("movie"):
+		_auto_start = true
+
 	# Add scene nodes
 	var scene_scripts := [
 		preload("res://scripts/scenes/title_scene.gd"),
@@ -58,6 +72,15 @@ func _ready() -> void:
 		node.set_meta("font", _font)
 		add_child(node)
 		_scenes.append(node)
+
+	# Create recording directory if needed
+	if _recording:
+		DirAccess.make_dir_recursive_absolute(_record_dir)
+		print("[RECORD] Saving frames to: ", ProjectSettings.globalize_path(_record_dir))
+
+	# Auto-start playback (for recording / movie mode)
+	if _auto_start:
+		call_deferred("_start_playback")
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
@@ -110,13 +133,26 @@ func _process(delta: float) -> void:
 	# Check if done
 	if _elapsed >= TOTAL_DURATION:
 		_playing = false
-		_overlay_visible = true
 		MusicPlayer.stop_soundtrack()
 		for s in _scenes:
 			s.visible = false
 		_current_scene_idx = -1
 
+		if _recording or _auto_start:
+			# When recording, quit after playback finishes
+			print("[RECORD] Recording complete. %d frames captured." % _record_frame_idx)
+			get_tree().quit()
+			return
+		else:
+			_overlay_visible = true
+
 	queue_redraw()
+
+	# Capture frame after rendering (at end of process so draw is done)
+	if _recording and _playing:
+		# We capture on the next frame via RenderingServer
+		await RenderingServer.frame_post_draw
+		_capture_frame()
 
 func _get_scene_index(t: float) -> int:
 	for i in range(SCENE_TIMES.size()):
@@ -195,3 +231,15 @@ func _draw_overlay() -> void:
 	if fmod(_frame, 60) < 30:
 		draw_string(_font, Vector2(W / 2, 420), "CLICK TO START",
 			HORIZONTAL_ALIGNMENT_CENTER, -1, 11, Color("aaaaaa"))
+
+# ── VIDEO RECORDING ─────────────────────────────────────────────────
+
+func _capture_frame() -> void:
+	var image := get_viewport().get_texture().get_image()
+	if image == null:
+		return
+	var filename := "%s/frame_%05d.png" % [_record_dir, _record_frame_idx]
+	image.save_png(filename)
+	_record_frame_idx += 1
+	if _record_frame_idx % 30 == 0:
+		print("[RECORD] Captured frame %d (%.1fs)" % [_record_frame_idx, _elapsed])
